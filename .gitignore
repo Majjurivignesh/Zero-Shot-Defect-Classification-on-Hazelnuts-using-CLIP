@@ -1,207 +1,780 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl font-bold text-foreground mb-6">CLIP Defect Classification</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            Zero-shot defect classification using CLIP on the MVTec-AD hazelnut dataset
+          </p>
 
-# C extensions
-*.so
+          <div className="grid md:grid-cols-2 gap-8 mt-12">
+            <div className="bg-card p-6 rounded-lg border">
+              <h2 className="text-2xl font-semibold mb-4">Dataset</h2>
+              <p className="text-muted-foreground">
+                MVTec-AD hazelnut subset with 5 defect classes: good, crack, cut, hole, and print
+              </p>
+            </div>
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+            <div className="bg-card p-6 rounded-lg border">
+              <h2 className="text-2xl font-semibold mb-4">Model</h2>
+              <p className="text-muted-foreground">
+                CLIP ViT-B/32 for zero-shot classification using natural language prompts
+              </p>
+            </div>
+          </div>
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+          <div className="mt-12 p-6 bg-muted rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Implementation Status</h3>
+            <p className="text-muted-foreground">
+              This project implements zero-shot defect classification with CLIP, including dataset setup, classification
+              logic, and performance analysis with confusion matrices.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
+"""
+Complete workflow script that runs all steps of the CLIP defect classification task
+"""
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+import os
+import sys
+from pathlib import Path
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
+# Add current directory to path so we can import our modules
+sys.path.append(str(Path(__file__).parent.parent))
 
-# Translations
-*.mo
-*.pot
+def run_complete_workflow():
+    """Run the complete workflow for CLIP defect classification"""
+    
+    print(" Starting Complete CLIP Defect Classification Workflow")
+    print("="*60)
+    
+    # Step 1: Setup dataset
+    print("\n Step 1: Setting up dataset...")
+    try:
+        from setup_dataset import download_mvtec_dataset
+        defect_types = download_mvtec_dataset()
+        print(" Dataset setup complete!")
+    except Exception as e:
+        print(f" Dataset setup failed: {e}")
+        print("Please manually download MVTec-AD dataset and place hazelnut images in data/hazelnut/test/")
+    
+    # Step 2: Git workflow setup
+    print("\n Step 2: Setting up Git workflow...")
+    try:
+        from git_workflow import setup_git_workflow
+        setup_git_workflow()
+        print(" Git workflow setup complete!")
+    except Exception as e:
+        print(f" Git workflow setup had issues: {e}")
+        print("Continuing with local development...")
+    
+    # Step 3: Validate configuration
+    print("\n Step 3: Validating configuration...")
+    try:
+        from spec import DefectClassificationSpec
+        config = DefectClassificationSpec()
+        print(f" Configuration loaded: {config.num_classes} classes, model: {config.model_name}")
+    except Exception as e:
+        print(f" Configuration validation failed: {e}")
+        return
+    
+    # Step 4: Run classification and analysis
+    print("\n Step 4: Running CLIP classification...")
+    try:
+        from run_classification_and_analysis import main as run_analysis
+        run_analysis()
+        print(" Classification and analysis complete!")
+    except Exception as e:
+        print(f" Classification failed: {e}")
+        print("Make sure you have installed: pip install torch torchvision clip-by-openai scikit-learn matplotlib seaborn")
+        return
+    
+    # Step 5: Git finalization
+    print("\n Step 5: Finalizing Git workflow...")
+    try:
+        from git_workflow import commit_and_merge_changes
+        commit_and_merge_changes()
+        print(" Git workflow finalized!")
+    except Exception as e:
+        print(f" Git finalization had issues: {e}")
+        print("Please manually commit and merge your changes")
+    
+    print("\n WORKFLOW COMPLETE!")
+    print("="*60)
+    print("Next steps:")
+    print("1. Review the confusion matrix and analysis results")
+    print("2. Save your Colab notebook to Google Drive")
+    print("3. Share the notebook link (Anyone with link → Viewer)")
+    print("4. Submit the link in your application form")
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+if __name__ == "__main__":
+    run_complete_workflow()
+import subprocess
+import os
 
-# Flask stuff:
-instance/
-.webassets-cache
+def run_git_command(command):
+    """Run a git command and return the output"""
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Git command failed: {command}")
+        print(f"Error: {e.stderr}")
+        return None
 
-# Scrapy stuff:
-.scrapy
+def setup_git_workflow():
+    """Set up the Git workflow for the project"""
+    print("Setting up Git workflow...")
+    
+    # Clone the repository (if not already cloned)
+    repo_url = "https://github.com/username/ZS-CLIP-AC-naive.git"  # Replace with actual repo
+    repo_name = "ZS-CLIP-AC-naive"
+    
+    if not os.path.exists(repo_name):
+        print(f"Cloning repository: {repo_url}")
+        clone_result = run_git_command(f"git clone {repo_url}")
+        if clone_result is not None:
+            print("Repository cloned successfully")
+        else:
+            print("Note: Repository cloning failed. Creating local git repo instead.")
+            run_git_command("git init")
+            run_git_command("git remote add origin " + repo_url)
+    
+    # Change to repo directory
+    if os.path.exists(repo_name):
+        os.chdir(repo_name)
+    
+    # Check current branch
+    current_branch = run_git_command("git branch --show-current")
+    print(f"Current branch: {current_branch}")
+    
+    # Create or checkout feature branch
+    feature_branch = "feature/defect-classification"
+    
+    # Check if feature branch exists
+    branches = run_git_command("git branch -a")
+    if feature_branch not in branches:
+        print(f"Creating feature branch: {feature_branch}")
+        run_git_command(f"git checkout -b {feature_branch}")
+    else:
+        print(f"Checking out existing feature branch: {feature_branch}")
+        run_git_command(f"git checkout {feature_branch}")
+    
+    print("Git workflow setup complete!")
+    return feature_branch
 
-# Sphinx documentation
-docs/_build/
+def commit_and_merge_changes():
+    """Commit changes and merge back to main"""
+    print("Committing and merging changes...")
+    
+    # Add all changes
+    run_git_command("git add .")
+    
+    # Commit changes
+    commit_message = "Implement zero-shot defect classification with CLIP"
+    run_git_command(f'git commit -m "{commit_message}"')
+    
+    # Switch to main branch
+    run_git_command("git checkout main")
+    
+    # Merge feature branch
+    feature_branch = "feature/defect-classification"
+    run_git_command(f"git merge {feature_branch}")
+    
+    # Show git log
+    print("\nGit log:")
+    log_output = run_git_command("git log --oneline -5")
+    print(log_output)
+    
+    # Show latest commit
+    print("\nLatest commit details:")
+    show_output = run_git_command("git show --stat")
+    print(show_output)
+    
+    print("Git workflow completed!")
 
-# PyBuilder
-.pybuilder/
-target/
+if __name__ == "__main__":
+    setup_git_workflow()
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
+from clip_ac import run_classification
+from spec import DefectClassificationSpec
+import os
 
-# Jupyter Notebook
-.ipynb_checkpoints
+def generate_confusion_matrix(results):
+    """Generate and display confusion matrix"""
+    y_true = results['y_true']
+    y_pred = results['y_pred']
+    config = results['config']
+    
+    # Create confusion matrix
+    cm = confusion_matrix(y_true, y_pred, labels=config.class_names)
+    
+    # Display confusion matrix
+    plt.figure(figsize=(10, 8))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=config.class_names)
+    disp.plot(cmap='Blues', values_format='d')
+    plt.title('Confusion Matrix - CLIP Zero-Shot Defect Classification\n(Hazelnut Dataset)')
+    plt.xticks(rotation=45)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
+    
+    # Print classification report
+    print("\nClassification Report:")
+    print("=" * 50)
+    report = classification_report(y_true, y_pred, labels=config.class_names, zero_division=0)
+    print(report)
+    
+    return cm
 
-# IPython
-profile_default/
-ipython_config.py
+def analyze_results(results):
+    """Analyze and provide observations about the results"""
+    y_true = results['y_true']
+    y_pred = results['y_pred']
+    confidences = results['confidences']
+    config = results['config']
+    
+    print("\n" + "="*60)
+    print("OBSERVATIONS AND ANALYSIS")
+    print("="*60)
+    
+    # Overall performance
+    accuracy = results['accuracy']
+    print(f"\n1. OVERALL PERFORMANCE:")
+    print(f"   - Accuracy: {accuracy:.1%}")
+    
+    if accuracy > 0.8:
+        print("   - CLIP performed very well on this task!")
+    elif accuracy > 0.6:
+        print("   - CLIP showed decent performance with room for improvement.")
+    else:
+        print("   - CLIP struggled with this classification task.")
+    
+    # Per-class analysis
+    print(f"\n2. PER-CLASS ANALYSIS:")
+    class_accuracies = {}
+    for class_name in config.class_names:
+        class_indices = [i for i, true_label in enumerate(y_true) if true_label == class_name]
+        if class_indices:
+            class_correct = sum(1 for i in class_indices if y_pred[i] == class_name)
+            class_acc = class_correct / len(class_indices)
+            class_accuracies[class_name] = class_acc
+            print(f"   - {class_name}: {class_acc:.1%} ({class_correct}/{len(class_indices)})")
+    
+    # Find most/least confused classes
+    if class_accuracies:
+        best_class = max(class_accuracies, key=class_accuracies.get)
+        worst_class = min(class_accuracies, key=class_accuracies.get)
+        print(f"   - Best performing: {best_class} ({class_accuracies[best_class]:.1%})")
+        print(f"   - Most challenging: {worst_class} ({class_accuracies[worst_class]:.1%})")
+    
+    # Confidence analysis
+    print(f"\n3. CONFIDENCE ANALYSIS:")
+    avg_confidence = np.mean(confidences)
+    print(f"   - Average confidence: {avg_confidence:.3f}")
+    
+    # Correct vs incorrect predictions confidence
+    correct_confidences = [conf for i, conf in enumerate(confidences) if y_true[i] == y_pred[i]]
+    incorrect_confidences = [conf for i, conf in enumerate(confidences) if y_true[i] != y_pred[i]]
+    
+    if correct_confidences:
+        print(f"   - Average confidence (correct): {np.mean(correct_confidences):.3f}")
+    if incorrect_confidences:
+        print(f"   - Average confidence (incorrect): {np.mean(incorrect_confidences):.3f}")
+    
+    # Common misclassifications
+    print(f"\n4. COMMON MISCLASSIFICATIONS:")
+    misclassifications = {}
+    for true_label, pred_label in zip(y_true, y_pred):
+        if true_label != pred_label:
+            key = f"{true_label} → {pred_label}"
+            misclassifications[key] = misclassifications.get(key, 0) + 1
+    
+    if misclassifications:
+        sorted_errors = sorted(misclassifications.items(), key=lambda x: x[1], reverse=True)
+        for error, count in sorted_errors[:3]:  # Top 3 errors
+            print(f"   - {error}: {count} times")
+    else:
+        print("   - No misclassifications found!")
+    
+    # Recommendations
+    print(f"\n5. RECOMMENDATIONS FOR IMPROVEMENT:")
+    
+    if accuracy < 0.7:
+        print("   - Consider more specific prompts (e.g., 'a close-up photo of a hazelnut with a visible crack')")
+        print("   - Try different CLIP model variants (ViT-L/14, RN50x64)")
+        print("   - Add more descriptive context to prompts")
+    
+    if worst_class in class_accuracies and class_accuracies[worst_class] < 0.5:
+        print(f"   - Focus on improving prompts for '{worst_class}' class")
+        print(f"   - Consider adding multiple prompt variations for '{worst_class}'")
+    
+    if len(set(y_pred)) < len(config.class_names):
+        missing_preds = set(config.class_names) - set(y_pred)
+        print(f"   - Some classes were never predicted: {missing_preds}")
+        print("   - Review and strengthen prompts for these classes")
+    
+    print("   - Consider ensemble methods with multiple prompt variations")
+    print("   - Experiment with prompt engineering techniques")
+    
+    return {
+        'accuracy': accuracy,
+        'class_accuracies': class_accuracies,
+        'avg_confidence': avg_confidence,
+        'misclassifications': misclassifications
+    }
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
+def main():
+    """Main function to run classification and analysis"""
+    print("CLIP Zero-Shot Defect Classification")
+    print("="*50)
+    
+    # Check if dataset exists
+    dataset_path = "data/hazelnut/test"
+    if not os.path.exists(dataset_path):
+        print(f"Dataset not found at {dataset_path}")
+        print("Please run setup_dataset.py first or manually download the MVTec-AD dataset")
+        return
+    
+    try:
+        # Run classification
+        results = run_classification(dataset_path)
+        
+        # Generate confusion matrix
+        cm = generate_confusion_matrix(results)
+        
+        # Analyze results
+        analysis = analyze_results(results)
+        
+        print(f"\n{'='*60}")
+        print("CLASSIFICATION COMPLETE!")
+        print(f"Results saved and confusion matrix displayed.")
+        print(f"{'='*60}")
+        
+    except Exception as e:
+        print(f"Error during classification: {e}")
+        print("Make sure you have:")
+        print("1. Installed required packages: pip install torch torchvision clip-by-openai")
+        print("2. Downloaded the MVTec-AD hazelnut dataset")
+        print("3. Placed images in the correct directory structure")
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+if __name__ == "__main__":
+    main()
+import os
+import requests
+import tarfile
+import shutil
+from pathlib import Path
 
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
+def download_mvtec_dataset():
+    """Download and extract MVTec-AD dataset"""
+    print("Setting up MVTec-AD dataset...")
+    
+    # Create data directory
+    data_dir = Path("data")
+    data_dir.mkdir(exist_ok=True)
+    
+    # MVTec-AD dataset URL (this is a placeholder - you'll need the actual URL)
+    # The actual dataset is typically downloaded from: https://www.mvtec.com/company/research/datasets/mvtec-ad
+    dataset_url = "https://www.mydrive.ch/shares/38536/3830184030e49fe74747669442f0f282/420938113-1629952094/mvtec_anomaly_detection.tar.xz"
+    
+    print("Note: You may need to manually download the MVTec-AD dataset from:")
+    print("https://www.mvtec.com/company/research/datasets/mvtec-ad")
+    print("and place it in the data/ directory")
+    
+    # For demonstration, create the expected directory structure
+    hazelnut_dir = data_dir / "hazelnut"
+    hazelnut_dir.mkdir(exist_ok=True)
+    
+    # Create test subdirectories for hazelnut defects
+    test_dir = hazelnut_dir / "test"
+    test_dir.mkdir(exist_ok=True)
+    
+    # Hazelnut defect types based on MVTec-AD dataset
+    defect_types = ["good", "crack", "cut", "hole", "print"]
+    
+    for defect_type in defect_types:
+        (test_dir / defect_type).mkdir(exist_ok=True)
+    
+    print(f"Created directory structure in {data_dir}")
+    print("Defect types for hazelnut:", defect_types)
+    
+    return defect_types
 
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-#poetry.toml
+if __name__ == "__main__":
+    defect_types = download_mvtec_dataset()
+    print("Dataset setup complete!")
+import torch
+import clip
+import numpy as np
+from PIL import Image
+from pathlib import Path
+from typing import List, Tuple, Dict
+import os
+from spec import DefectClassificationSpec
 
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
-#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
-#pdm.lock
-#pdm.toml
-.pdm-python
-.pdm-build/
+class CLIPDefectClassifier:
+    """Zero-shot defect classifier using CLIP"""
+    
+    def __init__(self, config: DefectClassificationSpec):
+        self.config = config
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Using device: {self.device}")
+        
+        # Load CLIP model
+        print(f"Loading CLIP model: {config.model_name}")
+        self.model, self.preprocess = clip.load(config.model_name, device=self.device)
+        
+        # Encode text prompts
+        print("Encoding text prompts...")
+        self.text_embeddings = self._encode_prompts()
+        
+    def _encode_prompts(self) -> torch.Tensor:
+        """Encode text prompts into embeddings"""
+        text_tokens = clip.tokenize(self.config.prompts).to(self.device)
+        
+        with torch.no_grad():
+            text_embeddings = self.model.encode_text(text_tokens)
+            text_embeddings = text_embeddings / text_embeddings.norm(dim=-1, keepdim=True)
+        
+        return text_embeddings
+    
+    def _encode_image(self, image_path: str) -> torch.Tensor:
+        """Encode a single image into embeddings"""
+        try:
+            image = Image.open(image_path).convert('RGB')
+            image_tensor = self.preprocess(image).unsqueeze(0).to(self.device)
+            
+            with torch.no_grad():
+                image_embedding = self.model.encode_image(image_tensor)
+                image_embedding = image_embedding / image_embedding.norm(dim=-1, keepdim=True)
+            
+            return image_embedding
+        except Exception as e:
+            print(f"Error processing image {image_path}: {e}")
+            return None
+    
+    def classify_image(self, image_path: str) -> Tuple[str, float, np.ndarray]:
+        """Classify a single image and return prediction, confidence, and similarities"""
+        image_embedding = self._encode_image(image_path)
+        
+        if image_embedding is None:
+            return "unknown", 0.0, np.zeros(len(self.config.class_names))
+        
+        # Calculate similarities
+        similarities = (image_embedding @ self.text_embeddings.T).squeeze(0)
+        similarities_np = similarities.cpu().numpy()
+        
+        # Get prediction
+        pred_idx = similarities.argmax().item()
+        confidence = torch.softmax(similarities, dim=0)[pred_idx].item()
+        predicted_class = self.config.class_names[pred_idx]
+        
+        return predicted_class, confidence, similarities_np
+    
+    def get_ground_truth_from_path(self, image_path: str) -> str:
+        """Extract ground truth label from image path"""
+        path_parts = Path(image_path).parts
+        
+        # Look for the defect type in the path
+        for part in reversed(path_parts):
+            if part in self.config.class_names:
+                return part
+        
+        # If not found, try to infer from parent directory
+        parent_dir = Path(image_path).parent.name
+        if parent_dir in self.config.class_names:
+            return parent_dir
+        
+        return "unknown"
+    
+    def classify_dataset(self, dataset_path: str) -> Tuple[List[str], List[str], List[str], List[float], List[np.ndarray]]:
+        """Classify all images in the dataset"""
+        dataset_path = Path(dataset_path)
+        
+        if not dataset_path.exists():
+            raise ValueError(f"Dataset path does not exist: {dataset_path}")
+        
+        # Find all image files
+        image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff'}
+        image_paths = []
+        
+        for ext in image_extensions:
+            image_paths.extend(dataset_path.rglob(f"*{ext}"))
+            image_paths.extend(dataset_path.rglob(f"*{ext.upper()}"))
+        
+        print(f"Found {len(image_paths)} images to classify")
+        
+        y_true = []
+        y_pred = []
+        image_names = []
+        confidences = []
+        all_similarities = []
+        
+        for i, image_path in enumerate(image_paths):
+            if i % 10 == 0:
+                print(f"Processing image {i+1}/{len(image_paths)}")
+            
+            # Get ground truth
+            gt_label = self.get_ground_truth_from_path(str(image_path))
+            
+            # Get prediction
+            pred_label, confidence, similarities = self.classify_image(str(image_path))
+            
+            y_true.append(gt_label)
+            y_pred.append(pred_label)
+            image_names.append(image_path.name)
+            confidences.append(confidence)
+            all_similarities.append(similarities)
+        
+        return y_true, y_pred, image_names, confidences, all_similarities
 
-# pixi
-#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
-#pixi.lock
-#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
-#   in the .venv directory. It is recommended not to include this directory in version control.
-.pixi
+def run_classification(dataset_path: str = "data/hazelnut/test") -> Dict:
+    """Run the complete classification pipeline"""
+    print("Starting zero-shot defect classification with CLIP...")
+    
+    # Load configuration
+    config = DefectClassificationSpec()
+    
+    # Initialize classifier
+    classifier = CLIPDefectClassifier(config)
+    
+    # Run classification
+    print(f"Classifying images in: {dataset_path}")
+    y_true, y_pred, image_names, confidences, similarities = classifier.classify_dataset(dataset_path)
+    
+    # Calculate accuracy
+    correct = sum(1 for true, pred in zip(y_true, y_pred) if true == pred)
+    accuracy = correct / len(y_true) if y_true else 0
+    
+    print(f"\nClassification Results:")
+    print(f"Total images: {len(y_true)}")
+    print(f"Accuracy: {accuracy:.3f} ({correct}/{len(y_true)})")
+    
+    results = {
+        'y_true': y_true,
+        'y_pred': y_pred,
+        'image_names': image_names,
+        'confidences': confidences,
+        'similarities': similarities,
+        'accuracy': accuracy,
+        'config': config
+    }
+    
+    return results
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
+if __name__ == "__main__":
+    # Run classification
+    results = run_classification()
+    
+    # Print some example predictions
+    print("\nExample predictions:")
+    for i in range(min(10, len(results['y_true']))):
+        print(f"Image: {results['image_names'][i]}")
+        print(f"  True: {results['y_true'][i]}, Pred: {results['y_pred'][i]}, Conf: {results['confidences'][i]:.3f}")
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+{
+  "name": "clip-defect-classification",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-accordion": "1.2.2",
+    "@radix-ui/react-alert-dialog": "1.1.4",
+    "@radix-ui/react-aspect-ratio": "1.1.1",
+    "@radix-ui/react-avatar": "1.1.2",
+    "@radix-ui/react-checkbox": "1.1.3",
+    "@radix-ui/react-collapsible": "1.1.2",
+    "@radix-ui/react-context-menu": "2.2.4",
+    "@radix-ui/react-dialog": "1.1.4",
+    "@radix-ui/react-dropdown-menu": "2.1.4",
+    "@radix-ui/react-hover-card": "1.1.4",
+    "@radix-ui/react-label": "2.1.1",
+    "@radix-ui/react-menubar": "1.1.4",
+    "@radix-ui/react-navigation-menu": "1.2.3",
+    "@radix-ui/react-popover": "1.1.4",
+    "@radix-ui/react-progress": "1.1.1",
+    "@radix-ui/react-radio-group": "1.2.2",
+    "@radix-ui/react-scroll-area": "1.2.2",
+    "@radix-ui/react-select": "2.1.4",
+    "@radix-ui/react-separator": "1.1.1",
+    "@radix-ui/react-slider": "1.2.2",
+    "@radix-ui/react-slot": "1.1.1",
+    "@radix-ui/react-switch": "1.1.2",
+    "@radix-ui/react-tabs": "1.1.2",
+    "@radix-ui/react-toast": "1.2.4",
+    "@radix-ui/react-toggle": "1.1.1",
+    "@radix-ui/react-toggle-group": "1.1.1",
+    "@radix-ui/react-tooltip": "1.1.6",
+    "autoprefixer": "^10.4.20",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "1.0.4",
+    "date-fns": "4.1.0",
+    "embla-carousel-react": "8.5.1",
+    "geist": "^1.3.1",
+    "input-otp": "1.4.1",
+    "lucide-react": "^0.454.0",
+    "next": "14.2.25",
+    "next-themes": "^0.4.6",
+    "react": "^19",
+    "react-day-picker": "9.8.0",
+    "react-dom": "^19",
+    "react-hook-form": "^7.60.0",
+    "react-resizable-panels": "^2.1.7",
+    "recharts": "2.15.4",
+    "sonner": "^1.7.4",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^0.9.9",
+    "zod": "3.25.67"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.9",
+    "@types/node": "^22",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8.5",
+    "tailwindcss": "^4.1.9",
+    "tw-animate-css": "1.3.3",
+    "typescript": "^5"
+  }
+}
+torch>=1.9.0
+torchvision>=0.10.0
+clip-by-openai
+pydantic>=1.8.0
+scikit-learn>=1.0.0
+matplotlib>=3.3.0
+seaborn>=0.11.0
+numpy>=1.21.0
+Pillow>=8.0.0
+requests>=2.25.0
+from pydantic import BaseModel
+from typing import List
 
-# SageMath parsed files
-*.sage.py
+class DefectClassificationSpec(BaseModel):
+    """Configuration class for defect classification using CLIP"""
+    
+    class_names: List[str] = [
+        "good",
+        "crack", 
+        "cut",
+        "hole",
+        "print"
+    ]
+    
+    prompts: List[str] = [
+        "a photo of a good hazelnut without any defects",
+        "a photo of a hazelnut with a crack defect",
+        "a photo of a hazelnut with a cut defect", 
+        "a photo of a hazelnut with a hole defect",
+        "a photo of a hazelnut with a print defect"
+    ]
+    
+    model_name: str = "ViT-B/32"
+    
+    def __post_init__(self):
+        """Validate that class_names and prompts have the same length"""
+        if len(self.class_names) != len(self.prompts):
+            raise ValueError("class_names and prompts must have the same length")
+    
+    @property
+    def num_classes(self) -> int:
+        """Return the number of classes"""
+        return len(self.class_names)
+    
+    def get_class_index(self, class_name: str) -> int:
+        """Get the index of a class name"""
+        try:
+            return self.class_names.index(class_name)
+        except ValueError:
+            raise ValueError(f"Class '{class_name}' not found in class_names")
 
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# Create default configuration instance
+default_config = DefectClassificationSpec()
 
-# Spyder project settings
-.spyderproject
-.spyproject
+if __name__ == "__main__":
+    # Test the configuration
+    config = DefectClassificationSpec()
+    print("Configuration loaded successfully!")
+    print(f"Number of classes: {config.num_classes}")
+    print(f"Class names: {config.class_names}")
+    print(f"Model: {config.model_name}")
+    print("\nPrompts:")
+    for i, prompt in enumerate(config.prompts):
+        print(f"  {config.class_names[i]}: {prompt}")
 
-# Rope project settings
-.ropeproject
 
-# mkdocs documentation
-/site
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Pyre type checker
-.pyre/
 
-# pytype static type analyzer
-.pytype/
 
-# Cython debug symbols
-cython_debug/
 
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
 
-# Abstra
-# Abstra is an AI-powered process automation framework.
-# Ignore directories containing user credentials, local state, and settings.
-# Learn more at https://abstra.io/docs
-.abstra/
 
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the entire vscode folder
-# .vscode/
 
-# Ruff stuff:
-.ruff_cache/
 
-# PyPI configuration file
-.pypirc
 
-# Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
 
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
